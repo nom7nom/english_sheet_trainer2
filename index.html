@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>スプレッドシート連携・長英文暗唱トレーナー</title>
+    <style>
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 650px;
+            margin: 20px auto;
+            padding: 15px;
+            text-align: center;
+            background-color: #f4f6f9;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        #japanese-text { font-size: 18px; font-weight: bold; margin-bottom: 25px; text-align: left; background: #eef5ff; padding: 15px; border-left: 5px solid #007bff; border-radius: 4px; min-height: 40px; }
+        #english-display { font-size: 22px; color: #111; min-height: 100px; text-align: left; margin-bottom: 30px; letter-spacing: 0.5px; word-wrap: break-word; }
+        
+        .btn-group { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+        button { flex: 1; font-size: 16px; padding: 15px 10px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: all 0.2s; }
+        .btn-left { background-color: #28a745; color: white; }
+        .btn-center { background-color: #007bff; color: white; }
+        .btn-right { background-color: #dc3545; color: white; }
+        .btn-learn { background-color: #6f42c1; color: white; width: 100%; font-size: 18px; margin-top: 15px; margin-bottom: 5px; }
+        .btn-next { background-color: #17a2b8; color: white; width: 100%; font-size: 18px; }
+        
+        button:disabled { background-color: #ccc !important; color: #666; cursor: not-allowed; }
+        .active-word { color: #007bff; font-weight: bold; }
+        #status-msg { font-size: 14px; color: #666; margin-top: 15px; text-align: right; }
+    </style>
+</head>
+<body>
+
+    <h2>長英文 暗唱トレーナー <span style="font-size:16px; color:#666;">(頻度調整版)</span></h2>
+    
+    <div class="card">
+        <div id="japanese-text">データを取得中...</div>
+        <div id="english-display"></div>
+        
+        <div class="btn-group">
+            <button class="btn-left" id="btn-char" onclick="showNextChar()">1文字</button>
+            <button class="btn-center" id="btn-word" onclick="showNextWord()">1単語</button>
+            <button class="btn-right" id="btn-all" onclick="showAll()">回答</button>
+        </div>
+        
+        <button class="btn-learn" id="btn-learn" onclick="markAsLearned()">覚えた！ (出題頻度を下げる)</button>
+        <button class="btn-next" id="btn-next-q" onclick="nextQuestion()">次へスキップ ➔</button>
+        
+        <div id="status-msg"></div>
+    </div>
+
+    <script>
+        // 【設定】ここにGASで取得したウェブアプリのURLを貼り付けてください
+        const gasUrl = "https://script.google.com/macros/s/AKfycbwwKHaX1MS4YVGIYmx9f6OkdwE9Jpdw3N403OgA8_baP7CFRL454Uh_E-mc7GJ649Wu/exec";
+
+        let questionBank = [];
+        let currentQuestion = null;
+        let words = [];
+        let currentWordIdx = 0;
+        let currentCharIdx = 0;
+        let lastTouchEnd = 0;
+
+        const jpElem = document.getElementById("japanese-text");
+        const enElem = document.getElementById("english-display");
+        const btnChar = document.getElementById("btn-char");
+        const btnWord = document.getElementById("btn-word");
+        const btnAll = document.getElementById("btn-all");
+        const btnLearn = document.getElementById("btn-learn");
+        const btnNext = document.getElementById("btn-next-q");
+        const statusElem = document.getElementById("status-msg");
+
+        fetchQuestions();
+
+        async function fetchQuestions() {
+            try {
+                toggleAllButtons(true);
+                jpElem.innerText = "スプレッドシートからデータを取得しています...";
+                
+                const response = await fetch(gasUrl);
+                if (!response.ok) throw new Error("データの取得に失敗しました。");
+                
+                questionBank = await response.json();
+
+                if (questionBank.length === 0) {
+                    jpElem.innerText = "エラー: 有効な問題が見つかりませんでした。";
+                    return;
+                }
+
+                statusElem.innerText = `全 ${questionBank.length} 問の読み込み完了`;
+                nextQuestion();
+
+            } catch (error) {
+                console.error(error);
+                jpElem.innerText = "データの読み込みに失敗しました。GASのURLや権限設定を確認してください。";
+            }
+        }
+
+        function nextQuestion() {
+            if (questionBank.length === 0) return;
+
+            // 【傾斜抽選】正解数に応じて出現確率を減らす計算
+            let totalWeight = 0;
+            const itemsWithWeight = questionBank.map(q => {
+                // 初期重み10。1回覚えるごとに重みを-2（最低値は1）。つまり覚えるほど選ばれにくくなる
+                let weight = Math.max(1, 10 - (q.count * 2));
+                totalWeight += weight;
+                return { ...q, cumulativeWeight: totalWeight };
+            });
+
+            const randomValue = Math.random() * totalWeight;
+            currentQuestion = itemsWithWeight.find(item => randomValue <= item.cumulativeWeight);
+
+            words = currentQuestion.en.split(/\s+/);
+            currentWordIdx = 0;
+            currentCharIdx = 0;
+
+            jpElem.innerText = currentQuestion.jp;
+            statusElem.innerText = `この問題の現在の正解数: ${currentQuestion.count}回`;
+            
+            togglePlayButtons(false);
+            btnNext.disabled = false;
+            btnLearn.disabled = false;
+            renderDisplay();
+        }
+
+        async function markAsLearned() {
+            if (!currentQuestion) return;
+
+            btnLearn.disabled = true;
+            btnLearn.innerText = "送信中...";
+            
+            // バックグラウンドでスプレッドシートの正解数を+1する
+            const updateUrl = `${gasUrl}?action=update&row=${currentQuestion.row}`;
+            
+            // アプリ内のデータもその場で更新（次回から出にくくする）
+            currentQuestion.count += 1;
+
+            try {
+                await fetch(updateUrl);
+                statusElem.innerText = "正解数を記録しました！";
+            } catch (e) {
+                console.error(e);
+                statusElem.innerText = "通信エラーですが、一時的に確率を下げました。";
+            } finally {
+                btnLearn.innerText = "覚えた！ (出題頻度を下げる)";
+                nextQuestion(); // 自動で次の問題へ
+            }
+        }
+
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        function renderDisplay() {
+            if (currentWordIdx >= words.length) {
+                enElem.innerText = currentQuestion.en;
+                togglePlayButtons(true);
+                return;
+            }
+
+            let html = "";
+            for (let i = 0; i < currentWordIdx; i++) {
+                html += words[i] + " ";
+            }
+
+            if (currentCharIdx > 0) {
+                const targetWord = words[currentWordIdx];
+                const visiblePart = targetWord.substring(0, currentCharIdx);
+                html += `<span class="active-word">${visiblePart}</span>`;
+            }
+
+            enElem.innerHTML = html || "<span style='color:#aaa;'>ボタンを押してスタート</span>";
+        }
+
+        function showNextChar() {
+            const targetWord = words[currentWordIdx];
+            currentCharIdx++;
+            if (currentCharIdx >= targetWord.length) {
+                currentWordIdx++;
+                currentCharIdx = 0;
+            }
+            renderDisplay();
+        }
+
+        function showNextWord() {
+            currentWordIdx++;
+            currentCharIdx = 0;
+            renderDisplay();
+        }
+
+        function showAll() {
+            enElem.innerText = currentQuestion.en;
+            togglePlayButtons(true);
+        }
+
+        function togglePlayButtons(disabled) {
+            btnChar.disabled = disabled;
+            btnWord.disabled = disabled;
+            btnAll.disabled = disabled;
+        }
+
+        function toggleAllButtons(disabled) {
+            togglePlayButtons(disabled);
+            btnNext.disabled = disabled;
+            btnLearn.disabled = disabled;
+        }
+    </script>
+</body>
+</html>
