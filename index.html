@@ -36,7 +36,21 @@
 }
         
         .btn-group { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
-        button { flex: 1; font-size: 16px; padding: 15px 10px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: all 0.2s; }
+        button { 
+    flex: 1; 
+    font-size: 16px; 
+    padding: 15px 10px; 
+    cursor: pointer; 
+    border: none; 
+    border-radius: 6px; 
+    font-weight: bold; 
+    transition: all 0.2s; 
+    
+    /* 選択と長押しメニューを禁止 */
+    -webkit-touch-callout: none; /*（iOS長押しメニューの無効化）*/
+    -webkit-user-select: none;   /*（テキスト選択の無効化）*/
+    user-select: none;
+}
         .btn-left { background-color: #28a745; color: white; }
         .btn-center { background-color: #007bff; color: white; }
         .btn-right { background-color: #dc3545; color: white; }
