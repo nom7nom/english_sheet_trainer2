@@ -24,7 +24,16 @@
         }
         .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
         #japanese-text { font-size: 18px; font-weight: bold; margin-bottom: 25px; text-align: left; background: #eef5ff; padding: 15px; border-left: 5px solid #007bff; border-radius: 4px; min-height: 40px; }
-        #english-display { font-size: 22px; color: #111; min-height: 100px; text-align: left; margin-bottom: 30px; letter-spacing: 0.5px; word-wrap: break-word; }
+        #english-display { 
+    font-size: 22px; 
+    color: #111; 
+    height: 150px; /* 高さを固定（必要に応じて120px〜200px等に調整） */
+    overflow-y: auto; /* 溢れた場合は枠内でスクロール */
+    text-align: left; 
+    margin-bottom: 20px; 
+    letter-spacing: 0.5px; 
+    word-wrap: break-word; 
+}
         
         .btn-group { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
         button { flex: 1; font-size: 16px; padding: 15px 10px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: all 0.2s; }
