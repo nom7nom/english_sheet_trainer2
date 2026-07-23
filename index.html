@@ -22,35 +22,56 @@
             color: #333;
             box-sizing: border-box;
         }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
-        #japanese-text { font-size: 18px; font-weight: bold; margin-bottom: 25px; text-align: left; background: #eef5ff; padding: 15px; border-left: 5px solid #007bff; border-radius: 4px; min-height: 40px; }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+            margin-bottom: 20px; 
+        }
+        #japanese-text { 
+            font-size: 18px; 
+            font-weight: bold; 
+            margin-bottom: 25px; 
+            text-align: left; 
+            background: #eef5ff; 
+            padding: 15px; 
+            border-left: 5px solid #007bff; 
+            border-radius: 4px; 
+            min-height: 40px; 
+        }
         #english-display { 
-    font-size: 22px; 
-    color: #111; 
-    height: 150px; /* 高さを固定（必要に応じて120px〜200px等に調整） */
-    overflow-y: auto; /* 溢れた場合は枠内でスクロール */
-    text-align: left; 
-    margin-bottom: 20px; 
-    letter-spacing: 0.5px; 
-    word-wrap: break-word; 
-}
+            font-size: 22px; 
+            color: #111; 
+            min-height: 100px; 
+            text-align: left; 
+            margin-top: 20px;
+            margin-bottom: 10px; 
+            letter-spacing: 0.5px; 
+            word-wrap: break-word; 
+        }
         
-        .btn-group { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }
+        .btn-group { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+        }
         button { 
-    flex: 1; 
-    font-size: 16px; 
-    padding: 15px 10px; 
-    cursor: pointer; 
-    border: none; 
-    border-radius: 6px; 
-    font-weight: bold; 
-    transition: all 0.2s; 
-    
-    /* 選択と長押しメニューを禁止 */
-    -webkit-touch-callout: none; /*（iOS長押しメニューの無効化）*/
-    -webkit-user-select: none;   /*（テキスト選択の無効化）*/
-    user-select: none;
-}
+            flex: 1; 
+            font-size: 16px; 
+            padding: 15px 10px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            transition: all 0.2s; 
+
+            /* 長押しメニュー・テキスト選択の防止 */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
         .btn-left { background-color: #28a745; color: white; }
         .btn-center { background-color: #007bff; color: white; }
         .btn-right { background-color: #dc3545; color: white; }
@@ -68,8 +89,8 @@
     
     <div class="card">
         <div id="japanese-text">データを取得中...</div>
-        <div id="english-display"></div>
         
+        <!-- 操作ボタン類を英文表示の上部に移動 -->
         <div class="btn-group">
             <button class="btn-left" id="btn-char" onclick="showNextChar()">1文字</button>
             <button class="btn-center" id="btn-word" onclick="showNextWord()">1単語</button>
@@ -79,6 +100,9 @@
         <button class="btn-learn" id="btn-learn" onclick="markAsLearned()">覚えた！ (出題頻度を下げる)</button>
         <button class="btn-next" id="btn-next-q" onclick="nextQuestion()">次へスキップ ➔</button>
         
+        <!-- 英文表示枠を下部に配置 -->
+        <div id="english-display"></div>
+
         <div id="status-msg"></div>
     </div>
 
