@@ -31,6 +31,7 @@
         }
         #japanese-text { 
             font-size: 18px; 
+            line-height: 1.5;
             font-weight: bold; 
             margin-bottom: 25px; 
             text-align: left; 
@@ -38,13 +39,16 @@
             padding: 15px; 
             border-left: 5px solid #007bff; 
             border-radius: 4px; 
-            min-height: 40px; 
+            /* 文字18px × line-height 1.5 = 1行27px。6行分で最小高さを162pxに固定 */
+            min-height: 162px; 
+            height: auto;
+            box-sizing: border-box;
         }
         #english-display { 
             font-size: 20px; 
             line-height: 1.5; 
             color: #111; 
-            /* 文字サイズ20px × line-height 1.5 = 1行30px。6行分で最小高さを180pxに固定 */
+            /* 英文も6行分で固定 */
             min-height: 180px; 
             height: auto; 
             text-align: left; 
@@ -90,12 +94,13 @@
     <h2>長英文 暗唱トレーナー <span style="font-size:16px; color:#666;">(頻度調整版)</span></h2>
     
     <div class="card">
+        <!-- 日本語表示枠（6行分固定） -->
         <div id="japanese-text">データを取得中...</div>
         
-        <!-- 英文表示枠（上部に復元） -->
+        <!-- 英文表示枠 -->
         <div id="english-display"></div>
         
-        <!-- 操作ボタン群（元の位置に復元） -->
+        <!-- 操作ボタン群 -->
         <div class="btn-group">
             <button class="btn-left" id="btn-char" onclick="showNextChar()">1文字</button>
             <button class="btn-center" id="btn-word" onclick="showNextWord()">1単語</button>
