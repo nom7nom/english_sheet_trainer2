@@ -41,12 +41,14 @@
             min-height: 40px; 
         }
         #english-display { 
-            font-size: 22px; 
+            font-size: 20px; 
+            line-height: 1.5; 
             color: #111; 
-            min-height: 100px; 
+            /* 文字サイズ20px × line-height 1.5 = 1行30px。6行分で最小高さを180pxに固定 */
+            min-height: 180px; 
+            height: auto; 
             text-align: left; 
-            margin-top: 20px;
-            margin-bottom: 10px; 
+            margin-bottom: 30px; 
             letter-spacing: 0.5px; 
             word-wrap: break-word; 
         }
@@ -90,7 +92,10 @@
     <div class="card">
         <div id="japanese-text">データを取得中...</div>
         
-        <!-- 操作ボタン類を英文表示の上部に移動 -->
+        <!-- 英文表示枠（上部に復元） -->
+        <div id="english-display"></div>
+        
+        <!-- 操作ボタン群（元の位置に復元） -->
         <div class="btn-group">
             <button class="btn-left" id="btn-char" onclick="showNextChar()">1文字</button>
             <button class="btn-center" id="btn-word" onclick="showNextWord()">1単語</button>
@@ -99,9 +104,6 @@
         
         <button class="btn-learn" id="btn-learn" onclick="markAsLearned()">覚えた！ (出題頻度を下げる)</button>
         <button class="btn-next" id="btn-next-q" onclick="nextQuestion()">次へスキップ ➔</button>
-        
-        <!-- 英文表示枠を下部に配置 -->
-        <div id="english-display"></div>
 
         <div id="status-msg"></div>
     </div>
@@ -158,7 +160,6 @@
             // 【傾斜抽選】正解数に応じて出現確率を減らす計算
             let totalWeight = 0;
             const itemsWithWeight = questionBank.map(q => {
-                // 初期重み10。1回覚えるごとに重みを-2（最低値は1）。つまり覚えるほど選ばれにくくなる
                 let weight = Math.max(1, 10 - (q.count * 2));
                 totalWeight += weight;
                 return { ...q, cumulativeWeight: totalWeight };
@@ -186,10 +187,7 @@
             btnLearn.disabled = true;
             btnLearn.innerText = "送信中...";
             
-            // バックグラウンドでスプレッドシートの正解数を+1する
             const updateUrl = `${gasUrl}?action=update&row=${currentQuestion.row}`;
-            
-            // アプリ内のデータもその場で更新（次回から出にくくする）
             currentQuestion.count += 1;
 
             try {
@@ -200,7 +198,7 @@
                 statusElem.innerText = "通信エラーですが、一時的に確率を下げました。";
             } finally {
                 btnLearn.innerText = "覚えた！ (出題頻度を下げる)";
-                nextQuestion(); // 自動で次の問題へ
+                nextQuestion();
             }
         }
 
