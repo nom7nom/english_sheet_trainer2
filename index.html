@@ -1,4 +1,3 @@
-HTML
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -40,7 +39,6 @@ HTML
             padding: 15px; 
             border-left: 5px solid #007bff; 
             border-radius: 4px; 
-            /* 文字18px × line-height 1.5 = 1行27px。6行分で最小高さを162pxに固定 */
             min-height: 162px; 
             height: auto;
             box-sizing: border-box;
@@ -49,7 +47,6 @@ HTML
             font-size: 20px; 
             line-height: 1.5; 
             color: #111; 
-            /* 英文も6行分で固定 */
             min-height: 180px; 
             height: auto; 
             text-align: left; 
@@ -74,7 +71,6 @@ HTML
             font-weight: bold; 
             transition: all 0.2s; 
 
-            /* 長押しメニュー・テキスト選択の防止 */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
@@ -85,12 +81,15 @@ HTML
         .btn-learn { background-color: #6f42c1; color: white; width: 100%; font-size: 18px; margin-top: 15px; margin-bottom: 15px; }
         
         /* 下部ボタン群用スタイル */
-        .btn-retry { background-color: #6c757d; color: white; font-size: 18px; }
-        /* 下部ボタン群用スタイル */
-        .btn-retry { background-color: #ffeaef; color: #d63384; border: 1px solid #f5c2c7; font-size: 18px; }
+        .btn-retry { 
+            background-color: #ffeaef; 
+            color: #d63384; 
+            border: 1px solid #f5c2c7;
+            font-size: 18px; 
+        }
         .btn-next { background-color: #17a2b8; color: white; font-size: 18px; }
         
-        button:disabled { background-color: #ccc !important; color: #666; cursor: not-allowed; }
+        button:disabled { background-color: #ccc !important; color: #666; border: none !important; cursor: not-allowed; }
         .active-word { color: #007bff; font-weight: bold; }
         #status-msg { font-size: 14px; color: #666; margin-top: 15px; text-align: right; }
     </style>
@@ -193,13 +192,11 @@ HTML
             resetProgress();
         }
 
-        // 同じ問題をもう一度最初から始める関数
         function retryQuestion() {
             if (!currentQuestion) return;
             resetProgress();
         }
 
-        // 表示・進行状況のリセット共通化
         function resetProgress() {
             currentWordIdx = 0;
             currentCharIdx = 0;
