@@ -82,14 +82,24 @@
         
         /* 下部ボタン群用スタイル */
         .btn-retry { 
-            background-color: #ffeaef; 
-            color: #d63384; 
+            background-color: #ffeaef !important; 
+            color: #d63384 !important; 
             border: 1px solid #f5c2c7;
             font-size: 18px; 
         }
         .btn-next { background-color: #17a2b8; color: white; font-size: 18px; }
         
-        button:disabled { background-color: #ccc !important; color: #666; border: none !important; cursor: not-allowed; }
+        button:disabled { 
+            background-color: #ccc; 
+            color: #666; 
+            border: none; 
+            cursor: not-allowed; 
+        }
+
+        .btn-retry:disabled {
+            opacity: 0.6;
+        }
+
         .active-word { color: #007bff; font-weight: bold; }
         #status-msg { font-size: 14px; color: #666; margin-top: 15px; text-align: right; }
     </style>
@@ -173,7 +183,6 @@
         function nextQuestion() {
             if (questionBank.length === 0) return;
 
-            // 【傾斜抽選】正解数に応じて出現確率を減らす計算
             let totalWeight = 0;
             const itemsWithWeight = questionBank.map(q => {
                 let weight = Math.max(1, 10 - (q.count * 2));
