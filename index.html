@@ -1,3 +1,4 @@
+HTML
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -57,7 +58,7 @@
             word-wrap: break-word; 
         }
         
-        .btn-group { 
+        .btn-group, .btn-group-bottom { 
             display: flex; 
             justify-content: space-between; 
             gap: 10px; 
@@ -81,8 +82,11 @@
         .btn-left { background-color: #28a745; color: white; }
         .btn-center { background-color: #007bff; color: white; }
         .btn-right { background-color: #dc3545; color: white; }
-        .btn-learn { background-color: #6f42c1; color: white; width: 100%; font-size: 18px; margin-top: 15px; margin-bottom: 5px; }
-        .btn-next { background-color: #17a2b8; color: white; width: 100%; font-size: 18px; }
+        .btn-learn { background-color: #6f42c1; color: white; width: 100%; font-size: 18px; margin-top: 15px; margin-bottom: 15px; }
+        
+        /* 下部ボタン群用スタイル */
+        .btn-retry { background-color: #6c757d; color: white; font-size: 18px; }
+        .btn-next { background-color: #17a2b8; color: white; font-size: 18px; }
         
         button:disabled { background-color: #ccc !important; color: #666; cursor: not-allowed; }
         .active-word { color: #007bff; font-weight: bold; }
@@ -100,7 +104,7 @@
         <!-- 英文表示枠 -->
         <div id="english-display"></div>
         
-        <!-- 操作ボタン群 -->
+        <!-- 操作ボタン群（上段） -->
         <div class="btn-group">
             <button class="btn-left" id="btn-char" onclick="showNextChar()">1文字</button>
             <button class="btn-center" id="btn-word" onclick="showNextWord()">1単語</button>
@@ -108,7 +112,12 @@
         </div>
         
         <button class="btn-learn" id="btn-learn" onclick="markAsLearned()">覚えた！ (出題頻度を下げる)</button>
-        <button class="btn-next" id="btn-next-q" onclick="nextQuestion()">次へスキップ ➔</button>
+        
+        <!-- 操作ボタン群（下段：もう一度 / 次へスキップ） -->
+        <div class="btn-group-bottom">
+            <button class="btn-retry" id="btn-retry" onclick="retryQuestion()">↺ もう一度</button>
+            <button class="btn-next" id="btn-next-q" onclick="nextQuestion()">次へスキップ ➔</button>
+        </div>
 
         <div id="status-msg"></div>
     </div>
@@ -130,6 +139,7 @@
         const btnWord = document.getElementById("btn-word");
         const btnAll = document.getElementById("btn-all");
         const btnLearn = document.getElementById("btn-learn");
+        const btnRetry = document.getElementById("btn-retry");
         const btnNext = document.getElementById("btn-next-q");
         const statusElem = document.getElementById("status-msg");
 
@@ -174,13 +184,25 @@
             currentQuestion = itemsWithWeight.find(item => randomValue <= item.cumulativeWeight);
 
             words = currentQuestion.en.split(/\s+/);
-            currentWordIdx = 0;
-            currentCharIdx = 0;
-
+            
             jpElem.innerText = currentQuestion.jp;
             statusElem.innerText = `この問題の現在の正解数: ${currentQuestion.count}回`;
             
+            resetProgress();
+        }
+
+        // 同じ問題をもう一度最初から始める関数
+        function retryQuestion() {
+            if (!currentQuestion) return;
+            resetProgress();
+        }
+
+        // 表示・進行状況のリセット共通化
+        function resetProgress() {
+            currentWordIdx = 0;
+            currentCharIdx = 0;
             togglePlayButtons(false);
+            btnRetry.disabled = false;
             btnNext.disabled = false;
             btnLearn.disabled = false;
             renderDisplay();
@@ -265,6 +287,7 @@
 
         function toggleAllButtons(disabled) {
             togglePlayButtons(disabled);
+            btnRetry.disabled = disabled;
             btnNext.disabled = disabled;
             btnLearn.disabled = disabled;
         }
