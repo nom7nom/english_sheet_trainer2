@@ -28,6 +28,9 @@
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
             margin-bottom: 20px; 
+            /* カード内のテキスト誤選択を防止 */
+            -webkit-user-select: none;
+            user-select: none;
         }
         #japanese-text { 
             font-size: 18px; 
@@ -42,6 +45,9 @@
             min-height: 162px; 
             height: auto;
             box-sizing: border-box;
+            /* 日本語テキストも連打時の誤選択を防止（必要に応じてコピーしたい場合は外してください） */
+            -webkit-user-select: none;
+            user-select: none;
         }
         #english-display { 
             font-size: 20px; 
@@ -53,6 +59,8 @@
             margin-bottom: 30px; 
             letter-spacing: 0.5px; 
             word-wrap: break-word; 
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .btn-group, .btn-group-bottom { 
@@ -78,7 +86,7 @@
         .btn-left { background-color: #28a745; color: white; }
         .btn-center { background-color: #007bff; color: white; }
         .btn-right { background-color: #dc3545; color: white; }
-        .btn-learn { background-color: #6f42c1; color: white; width: 100%; font-size: 18px; margin-top: 15px; margin-bottom: 15px; }
+        .btn-learn { background-color: #6f42c1; color: white; width: 100%; font-size: 18px; margin-top: 5px; margin-bottom: 15px; }
         
         /* 下部ボタン群用スタイル */
         .btn-retry { 
@@ -101,7 +109,14 @@
         }
 
         .active-word { color: #007bff; font-weight: bold; }
-        #status-msg { font-size: 14px; color: #666; margin-top: 15px; text-align: right; }
+        #status-msg { 
+            font-size: 14px; 
+            color: #666; 
+            margin-top: 15px; 
+            text-align: right; 
+            -webkit-user-select: none;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -122,13 +137,14 @@
             <button class="btn-right" id="btn-all" onclick="showAll()">回答</button>
         </div>
         
-        <button class="btn-learn" id="btn-learn" onclick="markAsLearned()">覚えた！ (出題頻度を下げる)</button>
-        
-        <!-- 操作ボタン群（下段：もう一度 / 次へスキップ） -->
+        <!-- 操作ボタン群（中段：もう一度 / 次へスキップ） -->
         <div class="btn-group-bottom">
             <button class="btn-retry" id="btn-retry" onclick="retryQuestion()">↺ もう一度</button>
             <button class="btn-next" id="btn-next-q" onclick="nextQuestion()">次へスキップ ➔</button>
         </div>
+
+        <!-- 覚えた！ボタン（下段に移動） -->
+        <button class="btn-learn" id="btn-learn" onclick="markAsLearned()">覚えた！ (出題頻度を下げる)</button>
 
         <div id="status-msg"></div>
     </div>
